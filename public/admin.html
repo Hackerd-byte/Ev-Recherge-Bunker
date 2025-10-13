@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - EV Recharge Bunk</title>
+  <link rel="stylesheet" href="/public/css/style.css">
+</head>
+<body>
+  <header class="header">
+    <h1>Admin Panel</h1>
+    <nav><a href="index.html">Home</a></nav>
+  </header>
+
+  <main class="admin-container">
+    <section class="card">
+      <h2>Create EV Bunk</h2>
+      <form id="createBunkForm">
+        <input type="text" id="bunkName" placeholder="Bunk Name" required>
+        <input type="text" id="bunkAddress" placeholder="Address" required>
+        <input type="tel" id="bunkPhone" placeholder="Phone" required>
+        <input type="number" step="any" id="bunkLat" placeholder="Latitude" required>
+        <input type="number" step="any" id="bunkLng" placeholder="Longitude" required>
+        <input type="number" id="bunkSlots" placeholder="Total Slots" required>
+        <button type="submit">Create Bunk</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Admin Login / Register</h2>
+      <input type="email" id="adminEmail" placeholder="Email">
+      <input type="password" id="adminPassword" placeholder="Password">
+      <div>
+        <button id="adminLogin">Login</button>
+        <button id="adminSignup">Sign Up</button>
+        <button id="adminLogout">Logout</button>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="/public/js/app.js"></script>
+</body>
+</html>
