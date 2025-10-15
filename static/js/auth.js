@@ -17,7 +17,7 @@ export async function register(auth, email, password) {
     if (error.code === "auth/email-already-in-use") {
       alert("This email is already registered. Please use Login instead.");
     } else if (error.code === "auth/invalid-email") {
-      alert("Invalid email format.");
+      alert("Invalid email format."); 
     } else if (error.code === "auth/weak-password") {
       alert("Password too weak. Use at least 6 characters.");
     } else {
