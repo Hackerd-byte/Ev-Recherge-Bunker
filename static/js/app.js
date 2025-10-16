@@ -63,18 +63,21 @@ document.addEventListener("DOMContentLoaded", async () => {
   // -----------------------------
   if (path.endsWith("admin.html")) {
     document.getElementById("adminSignup").onclick = async () => {
+      console.log("User Click to Register");
       await register(auth, adminEmail.value, adminPassword.value);
-      alert("✅ Admin registered successfully!");
+      alert("Admin registered successfully!");
     };
 
     document.getElementById("adminLogin").onclick = async () => {
+      console.log("User Click to Login");
       await login(auth, adminEmail.value, adminPassword.value);
-      alert("✅ Admin logged in!");
+      alert("Admin logged in!");
     };
 
     document.getElementById("adminLogout").onclick = async () => {
+      console.log("User Click to Logout!!!");
       await logout(auth);
-      alert("🔒 Logged out successfully!");
+      alert("Logged out successfully!");
     };
 
     document.getElementById("createBunkForm").onsubmit = async (e) => {
@@ -89,7 +92,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       };
 
       await addBunk(bunk);
-      alert("🚀 EV Bunk created successfully!");
+      alert("EV Bunk created successfully!");
       e.target.reset();
     };
   }
