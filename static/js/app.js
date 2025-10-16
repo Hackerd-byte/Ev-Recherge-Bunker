@@ -1,13 +1,7 @@
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 import { initAuth, login, register, logout } from "./auth.js";
-import {
-  initDB,
-  addBunk,
-  getBunks,
-  getBunk,
-  watchSlots,
-  bookSlot
-} from "./bunkservice.js";
+import { initDB, addBunk, getBunks, getBunk, getSlots, watchSlots, bookSlot } from "./bunkservice.js";
 import { showBunks } from "./ui.js";
 // import * as L from "https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.esm.js";
 
@@ -29,7 +23,7 @@ const auth = initAuth(app);
 initDB(app);
 
 // -----------------------------
-// Initialize Leaflet Map (Home Page)
+// Initialize Leaflet Map (for home page)
 // -----------------------------
 async function initLeafletMap(containerId) {
   const map = L.map(containerId).setView([20.5937, 78.9629], 5);
@@ -52,103 +46,75 @@ async function initLeafletMap(containerId) {
 }
 
 // -----------------------------
-// Main Page Logic
+// Page Logic
 // -----------------------------
 document.addEventListener("DOMContentLoaded", async () => {
-  // Get current page filename (works for localhost + Netlify)
-  const currentPage = window.location.pathname.split("/").pop() || "index.html";
-  console.log("Current Page:", currentPage);
-
+  const path = location.pathname;
+  console.log(path);
   // -----------------------------
   // INDEX PAGE (Home)
   // -----------------------------
-  if (currentPage === "index.html" || currentPage === "") {
+  if (path.endsWith("index.html") || path === "/" || path === "/public/") {
     await initLeafletMap("map");
   }
 
   // -----------------------------
   // ADMIN PAGE
   // -----------------------------
-  else if (currentPage === "admin.html") {
-    const signupBtn = document.getElementById("adminSignup");
-    const loginBtn = document.getElementById("adminLogin");
-    const logoutBtn = document.getElementById("adminLogout");
-    const form = document.getElementById("createBunkForm");
+  if (path.endsWith("admin.html")) {
+    document.getElementById("adminSignup").onclick = async () => {
+      console.log("User Click to Register");
+      await register(auth, adminEmail.value, adminPassword.value);
+      alert("Admin registered successfully!");
+    };
 
-    if (signupBtn) {
-      signupBtn.onclick = async () => {
-        console.log("Admin register clicked");
-        await register(auth, adminEmail.value, adminPassword.value);
-        alert("Admin registered successfully!");
+    document.getElementById("adminLogin").onclick = async () => {
+      console.log("User Click to Login");
+      await login(auth, adminEmail.value, adminPassword.value);
+      alert("Admin logged in!");
+    };
+
+    document.getElementById("adminLogout").onclick = async () => {
+      console.log("User Click to Logout!!!");
+      await logout(auth);
+      alert("Logged out successfully!");
+    };
+
+    document.getElementById("createBunkForm").onsubmit = async (e) => {
+      e.preventDefault();
+      const bunk = {
+        name: bunkName.value.trim(),
+        address: bunkAddress.value.trim(),
+        phone: bunkPhone.value.trim(),
+        lat: parseFloat(bunkLat.value),
+        lng: parseFloat(bunkLng.value),
+        totalSlots: parseInt(bunkSlots.value)
       };
-    }
 
-    if (loginBtn) {
-      loginBtn.onclick = async () => {
-        console.log("Admin login clicked");
-        await login(auth, adminEmail.value, adminPassword.value);
-        alert("Admin logged in!");
-      };
-    }
-
-    if (logoutBtn) {
-      logoutBtn.onclick = async () => {
-        console.log("Admin logout clicked");
-        await logout(auth);
-        alert("Logged out successfully!");
-      };
-    }
-
-    if (form) {
-      form.onsubmit = async (e) => {
-        e.preventDefault();
-        const bunk = {
-          name: bunkName.value.trim(),
-          address: bunkAddress.value.trim(),
-          phone: bunkPhone.value.trim(),
-          lat: parseFloat(bunkLat.value),
-          lng: parseFloat(bunkLng.value),
-          totalSlots: parseInt(bunkSlots.value)
-        };
-
-        await addBunk(bunk);
-        alert("EV Bunk created successfully!");
-        e.target.reset();
-      };
-    }
+      await addBunk(bunk);
+      alert("EV Bunk created successfully!");
+      e.target.reset();
+    };
   }
 
   // -----------------------------
   // BUNK DETAILS PAGE
   // -----------------------------
-  else if (currentPage === "bunk.html") {
+  if (path.endsWith("bunk.html")) {
     const params = new URLSearchParams(location.search);
     const bunkId = params.get("id");
-
-    if (!bunkId) {
-      alert("No bunk ID provided!");
-      return;
-    }
-
     const bunk = await getBunk(bunkId);
-    if (!bunk) {
-      alert("Bunk not found!");
-      return;
-    }
 
     // Display bunk details
-    const bunkDetails = document.getElementById("bunkDetails");
-    if (bunkDetails) {
-      bunkDetails.innerHTML = `
-        <h2>${bunk.name}</h2>
-        <p>${bunk.address}</p>
-        <p>📞 ${bunk.phone}</p>
-        <p>Total Slots: ${bunk.totalSlots}</p>
-      `;
-    }
+    document.getElementById("bunkDetails").innerHTML = `
+      <h2>${bunk.name}</h2>
+      <p>${bunk.address}</p>
+      <p>📞 ${bunk.phone}</p>
+      <p>Total Slots: ${bunk.totalSlots}</p>
+    `;
+    
 
-    // Real-time slot updates
-    const slotContainer = document.getElementById("slotContainer");
+    // 🔁 Real-time slot updates
     watchSlots(bunkId, (slots) => {
       slotContainer.innerHTML = "";
       if (!slots.length) {
@@ -166,6 +132,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           <button ${!available ? "disabled" : ""}>${available ? "Book Now" : "Occupied"}</button>
         `;
 
+        // ✅ Booking action
         if (available) {
           slotDiv.querySelector("button").addEventListener("click", async () => {
             try {
@@ -186,19 +153,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         slotContainer.appendChild(slotDiv);
       });
     });
-
+    
     // Mini map for bunk
     const map = L.map("slotMap").setView([bunk.lat, bunk.lng], 13);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
     L.marker([bunk.lat, bunk.lng]).addTo(map).bindPopup(bunk.name).openPopup();
-  }
-
-  // -----------------------------
-  // UNKNOWN PAGE (optional)
-  // -----------------------------
-  else {
-    console.warn("⚠️ Unknown page:", currentPage);
   }
 });
