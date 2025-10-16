@@ -50,7 +50,7 @@ async function initLeafletMap(containerId) {
 // -----------------------------
 document.addEventListener("DOMContentLoaded", async () => {
   const path = location.pathname;
-
+  console.log(path);
   // -----------------------------
   // INDEX PAGE (Home)
   // -----------------------------
