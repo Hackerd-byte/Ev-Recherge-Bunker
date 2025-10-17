@@ -93,7 +93,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("adminLogin").onclick = async () => {
       try {
         await login(auth, adminEmail.value, adminPassword.value);
-        alert("Admin logged in!");
       } catch (err) {
         console.error("Login error:", err);
         alert(err.message);

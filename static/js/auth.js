@@ -21,7 +21,7 @@ export async function register(auth, email, password) {
     } else if (error.code === "auth/weak-password") {
       alert("Password too weak. Use at least 6 characters.");
     } else {
-      alert(`ERROR(${error.code}):${error.message}`);
+      alert(`${error.message}`);
     }
   }
   //return userCredential;
@@ -32,7 +32,7 @@ export async function login(auth, email, password) {
     await signInWithEmailAndPassword(auth, email, password);
     alert("Logged in successfully!");
   } catch (error) {
-    alert(`ERROR(${error.code}):${error.message}`);
+    alert(`${error.message}`);
   }
 }
 
