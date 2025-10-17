@@ -1,4 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
 import { initAuth, login, register, logout } from "./auth.js";
 import { initDB, addBunk, getBunks, getBunk, getSlots, watchSlots, bookSlot } from "./bunkservice.js";
 import { showBunks } from "./ui.js";
@@ -69,7 +70,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("adminSignup").onclick = async () => {
       try {
         await register(auth, adminEmail.value, adminPassword.value);
-        alert("Admin registered successfully!");
       } catch (err) {
         console.error("Register error:", err);
         alert(err.message);
@@ -77,7 +77,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
     document.getElementById("adminLogin").onclick = async () => {
-      console.log("User Clicked Login");
       try {
         await login(auth, adminEmail.value, adminPassword.value);
         alert("Admin logged in!");
@@ -87,15 +86,29 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     };
 
-    document.getElementById("adminLogout").onclick = async () => {
-      console.log("User Clicked Logout");
-      try {
-        await logout(auth);
-        alert("Logged out successfully!");
-      } catch (err) {
-        console.error("Logout error:", err);
+    onAuthStateChanged(auth, (user) => {
+      const logoutBtn = document.getElementById("adminLogout");
+
+      if (user) {
+        // User is logged in — enable button
+        logoutBtn.disabled = false;
+        logoutBtn.onclick = async () => {
+          try {
+            await logout(auth);
+            alert("Logged out successfully!");
+          } catch (err) {
+            console.error("Logout error:", err);
+          }
+        };
+      } 
+      else {
+        logoutBtn.onclick = async() => {
+          alert("You must be logged in to log out.");
+          logoutBtn.disabled = true;
+        };
       }
-    };
+    });
+
 
     document.getElementById("createBunkForm").onsubmit = async (e) => {
       e.preventDefault();
