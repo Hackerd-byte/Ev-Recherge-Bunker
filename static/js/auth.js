@@ -24,7 +24,7 @@ export async function register(auth, email, password) {
       alert(`ERROR(${error.code}):${error.message}`);
     }
   }
-  return userCredential;
+  //return userCredential;
 }
 
 export async function login(auth, email, password) {

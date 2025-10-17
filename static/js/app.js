@@ -64,10 +64,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   // ADMIN PAGE (admin.html)
   // -----------------------------
   if (path.endsWith("admin.html")) {
-    console.log("Admin page detected");
+  
 
     document.getElementById("adminSignup").onclick = async () => {
-      console.log("User Clicked Register");
       try {
         await register(auth, adminEmail.value, adminPassword.value);
         alert("Admin registered successfully!");
