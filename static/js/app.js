@@ -1,9 +1,7 @@
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 import { initAuth, login, register, logout } from "./auth.js";
 import { initDB, addBunk, getBunks, getBunk, getSlots, watchSlots, bookSlot } from "./bunkservice.js";
 import { showBunks } from "./ui.js";
-// import * as L from "https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.esm.js";
 
 // -----------------------------
 // Firebase Configuration
@@ -17,13 +15,16 @@ const firebaseConfig = {
   appId: "1:628165718463:web:e0c150ae49c61c5f48310a"
 };
 
+// -----------------------------
 // Initialize Firebase
+// -----------------------------
 const app = initializeApp(firebaseConfig);
 const auth = initAuth(app);
 initDB(app);
 
+
 // -----------------------------
-// Initialize Leaflet Map (for home page)
+// Initialize Leaflet Map
 // -----------------------------
 async function initLeafletMap(containerId) {
   const map = L.map(containerId).setView([20.5937, 78.9629], 5);
@@ -38,7 +39,7 @@ async function initLeafletMap(containerId) {
     marker.bindPopup(`
       <strong>${bunk.name}</strong><br>
       ${bunk.address}<br>
-      <button class="popup-btn" onclick="window.location='bunk.html?id=${bunk.id}'">View</button>
+      <button class="popup-btn" onclick="window.location.href='bunk.html?id=${bunk.id}'">View</button>
     `);
   });
 
@@ -46,38 +47,55 @@ async function initLeafletMap(containerId) {
 }
 
 // -----------------------------
-// Page Logic
+// Main Page Logic
 // -----------------------------
 document.addEventListener("DOMContentLoaded", async () => {
   const path = location.pathname;
-  console.log(path);
+  console.log("Current Path:", path);
+
   // -----------------------------
-  // INDEX PAGE (Home)
+  // HOME PAGE (index.html)
   // -----------------------------
   if (path.endsWith("index.html") || path === "/" || path === "/public/") {
     await initLeafletMap("map");
   }
 
   // -----------------------------
-  // ADMIN PAGE
+  // ADMIN PAGE (admin.html)
   // -----------------------------
-  if (path.endsWith("admin.html") || path ==="/admin") {
+  if (path.endsWith("admin.html")) {
+    console.log("Admin page detected");
+
     document.getElementById("adminSignup").onclick = async () => {
-      console.log("User Click to Register");
-      await register(auth, adminEmail.value, adminPassword.value);
-      alert("Admin registered successfully!");
+      console.log("User Clicked Register");
+      try {
+        await register(auth, adminEmail.value, adminPassword.value);
+        alert("Admin registered successfully!");
+      } catch (err) {
+        console.error("Register error:", err);
+        alert(err.message);
+      }
     };
 
     document.getElementById("adminLogin").onclick = async () => {
-      console.log("User Click to Login");
-      await login(auth, adminEmail.value, adminPassword.value);
-      alert("Admin logged in!");
+      console.log("User Clicked Login");
+      try {
+        await login(auth, adminEmail.value, adminPassword.value);
+        alert("Admin logged in!");
+      } catch (err) {
+        console.error("Login error:", err);
+        alert(err.message);
+      }
     };
 
     document.getElementById("adminLogout").onclick = async () => {
-      console.log("User Click to Logout!!!");
-      await logout(auth);
-      alert("Logged out successfully!");
+      console.log("User Clicked Logout");
+      try {
+        await logout(auth);
+        alert("Logged out successfully!");
+      } catch (err) {
+        console.error("Logout error:", err);
+      }
     };
 
     document.getElementById("createBunkForm").onsubmit = async (e) => {
@@ -90,31 +108,34 @@ document.addEventListener("DOMContentLoaded", async () => {
         lng: parseFloat(bunkLng.value),
         totalSlots: parseInt(bunkSlots.value)
       };
-
-      await addBunk(bunk);
-      alert("EV Bunk created successfully!");
-      e.target.reset();
+      try {
+        await addBunk(bunk);
+        alert("EV Bunk created successfully!");
+        e.target.reset();
+      } catch (err) {
+        console.error("Add bunk error:", err);
+        alert(err.message);
+      }
     };
   }
 
   // -----------------------------
-  // BUNK DETAILS PAGE
+  // BUNK DETAILS PAGE (bunk.html)
   // -----------------------------
   if (path.endsWith("bunk.html")) {
     const params = new URLSearchParams(location.search);
     const bunkId = params.get("id");
     const bunk = await getBunk(bunkId);
 
-    // Display bunk details
+    // Show bunk details
     document.getElementById("bunkDetails").innerHTML = `
       <h2>${bunk.name}</h2>
       <p>${bunk.address}</p>
       <p>📞 ${bunk.phone}</p>
       <p>Total Slots: ${bunk.totalSlots}</p>
     `;
-    
 
-    // 🔁 Real-time slot updates
+    // Real-time slot updates
     watchSlots(bunkId, (slots) => {
       slotContainer.innerHTML = "";
       if (!slots.length) {
@@ -132,7 +153,6 @@ document.addEventListener("DOMContentLoaded", async () => {
           <button ${!available ? "disabled" : ""}>${available ? "Book Now" : "Occupied"}</button>
         `;
 
-        // ✅ Booking action
         if (available) {
           slotDiv.querySelector("button").addEventListener("click", async () => {
             try {
@@ -141,7 +161,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 alert("Please log in before booking!");
                 return;
               }
-
               await bookSlot(bunkId, slot.id, user.uid);
               alert(`✅ Slot ${slot.slotNumber} booked successfully!`);
             } catch (err) {
@@ -149,12 +168,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
           });
         }
-
         slotContainer.appendChild(slotDiv);
       });
     });
-    
-    // Mini map for bunk
+
+    // Small bunk map
     const map = L.map("slotMap").setView([bunk.lat, bunk.lng], 13);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: '&copy; OpenStreetMap contributors'
