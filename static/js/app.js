@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // -----------------------------
   // ADMIN PAGE
   // -----------------------------
-  if (path.endsWith("admin.html")) {
+  if (path.endsWith("admin.html") || path ==="admin") {
     document.getElementById("adminSignup").onclick = async () => {
       console.log("User Click to Register");
       await register(auth, adminEmail.value, adminPassword.value);
