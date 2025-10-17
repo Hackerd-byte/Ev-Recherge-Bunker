@@ -1,5 +1,3 @@
-// map.js — Leaflet (OpenStreetMap) based map utility
-
 // Initialize the Leaflet map
 export function initMap(containerId, center = { lat: 12.9716, lng: 77.5946 }, zoom = 12) {
   // Create the map

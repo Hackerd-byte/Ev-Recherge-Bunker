@@ -1,16 +1,4 @@
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  doc,
-  getDocs,
-  getDoc,
-  runTransaction,
-  serverTimestamp,
-  updateDoc,
-  setDoc,
-  onSnapshot,
-} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import {getFirestore,collection,addDoc,doc,getDocs,getDoc,runTransaction,serverTimestamp,updateDoc,setDoc,onSnapshot,} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
 let db;
 
@@ -22,9 +10,7 @@ export function initDB(app) {
 
 export const SLOT_DURATION_HOURS = 2;
 
-// -----------------------------
 // Add New Bunk with Slots
-// -----------------------------
 export async function addBunk(bunk) {
   try {
     bunk.createdAt = serverTimestamp();
@@ -53,17 +39,13 @@ export async function addBunk(bunk) {
   }
 }
 
-// -----------------------------
 // Get All Bunks
-// -----------------------------
 export async function getBunks() {
   const snap = await getDocs(collection(db, "bunks"));
   return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 }
 
-// -----------------------------
 // Get Single Bunk by ID
-// -----------------------------
 export async function getBunk(id) {
   const ref = doc(db, "bunks", id);
   const snap = await getDoc(ref);
@@ -71,9 +53,7 @@ export async function getBunk(id) {
   return { id: snap.id, ...snap.data() };
 }
 
-// -----------------------------
 // Get Slots for a Bunk (auto-release expired)
-// -----------------------------
 export async function getSlots(bunkId) {
   const snap = await getDocs(collection(db, `bunks/${bunkId}/slots`));
   const now = new Date();
@@ -102,9 +82,7 @@ export async function getSlots(bunkId) {
   return slots;
 }
 
-// -----------------------------
 // Live Slot Updates (Realtime)
-// -----------------------------
 export function watchSlots(bunkId, callback) {
   const slotsRef = collection(db, `bunks/${bunkId}/slots`);
   return onSnapshot(slotsRef, (snapshot) => {
@@ -116,9 +94,7 @@ export function watchSlots(bunkId, callback) {
   });
 }
 
-// -----------------------------
 // Book Slot (Transaction-safe)
-// -----------------------------
 export async function bookSlot(bunkId, slotId, userId) {
   const slotRef = doc(db, "bunks", bunkId, "slots", slotId);
   return runTransaction(db, async (tx) => {
@@ -135,9 +111,7 @@ export async function bookSlot(bunkId, slotId, userId) {
   });
 }
 
-// -----------------------------
 // Release Slot
-// -----------------------------
 export async function releaseSlot(bunkId, slotId) {
   const slotRef = doc(db, "bunks", bunkId, "slots", slotId);
   await updateDoc(slotRef, {

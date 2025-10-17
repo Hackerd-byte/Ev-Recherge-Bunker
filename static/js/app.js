@@ -1,20 +1,10 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
 import { initAuth, login, register, logout } from "./auth.js";
-import {
-  initDB,
-  addBunk,
-  getBunks,
-  getBunk,
-  getSlots,
-  watchSlots,
-  bookSlot,
-} from "./bunkservice.js";
+import {initDB,addBunk,getBunks,getBunk,getSlots,watchSlots,bookSlot,} from "./bunkservice.js";
 import { showBunks } from "./ui.js";
 
-// -----------------------------
 // Firebase Config
-// -----------------------------
 const firebaseConfig = {
   apiKey: "AIzaSyAZfXN8EO_NxnZk4N6H18wA1TktwR5wsYw",
   authDomain: "ev-recharge-bunker.firebaseapp.com",
@@ -24,9 +14,7 @@ const firebaseConfig = {
   appId: "1:628165718463:web:e0c150ae49c61c5f48310a",
 };
 
-// -----------------------------
 // Initialize Firebase
-// -----------------------------
 const app = initializeApp(firebaseConfig);
 const auth = initAuth(app);
 initDB(app);
@@ -35,9 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const path = location.pathname.split("/").pop() || "index.html";
   console.log("Current Path:", path);
 
-  // -----------------------------
   // HOME PAGE
-  // -----------------------------
   if (path === "index.html" || path === "") {
     const map = L.map("map").setView([20.5937, 78.9629], 5);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -56,9 +42,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     showBunks(bunks);
   }
 
-  // -----------------------------
   // ADMIN PAGE
-  // -----------------------------
   if (path === "admin.html") {
     const logoutBtn = document.getElementById("adminLogout");
 
@@ -120,9 +104,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
   }
 
-  // -----------------------------
   // BUNK DETAILS PAGE
-  // -----------------------------
   if (path === "bunk.html") {
     const params = new URLSearchParams(location.search);
     const bunkId = params.get("id");
