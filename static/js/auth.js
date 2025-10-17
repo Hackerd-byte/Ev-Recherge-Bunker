@@ -8,8 +8,7 @@ import {
 export function initAuth(app) {
   return getAuth(app);
 }
-
-export async function register(auth, email, password) {
+export async function register(auth, email, password) { 
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     alert(`Admin created: ${userCredential.user.email}`);

@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         logoutBtn.disabled = false;
         logoutBtn.onclick = async () => {
           try {
-            await logout(auth);
+            await logout(auth); 
             alert("Logged out successfully!");
           } catch (err) {
             console.error("Logout error:", err);
